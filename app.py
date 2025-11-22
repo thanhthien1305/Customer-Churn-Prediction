@@ -6,9 +6,10 @@ import pickle
 st.title("📊 AI Customer Churn Prediction")
 st.write("Dự đoán khách hàng có rời bỏ hay không dựa trên mô hình Machine Learning")
 
-# Load model và scaler
+# Load model, scaler và feature_names
 model = pickle.load(open("model.pkl", "rb"))
 scaler = pickle.load(open("scaler.pkl", "rb"))
+feature_names = pickle.load(open("feature_names.pkl", "rb"))  # ← Thêm dòng này
 
 uploaded_file = st.file_uploader("📥 Tải file CSV Telco Customer Churn", type=["csv"])
 
@@ -24,12 +25,12 @@ if uploaded_file is not None:
 
     df_processed = pd.get_dummies(df, drop_first=True)
 
-    # Đồng bộ với cột của model (feature alignment)
-    missing_cols = set(model.feature_names_in_) - set(df_processed.columns)
+    # Đồng bộ với cột của model
+    missing_cols = set(feature_names) - set(df_processed.columns)  # ← Sửa dòng này
     for c in missing_cols:
         df_processed[c] = 0
 
-    df_processed = df_processed[model.feature_names_in_]
+    df_processed = df_processed[feature_names]  # ← Sửa dòng này
 
     # Scale
     X_scaled = scaler.transform(df_processed)
